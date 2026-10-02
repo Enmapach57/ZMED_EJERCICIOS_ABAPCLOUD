@@ -1,0 +1,39 @@
+CLASS zeje_bloqi_types_referent DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+    INTERFACES if_oo_adt_classrun.
+
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+CLASS zeje_bloqi_types_referent IMPLEMENTATION.
+
+  METHOD if_oo_adt_classrun~main.
+
+
+    DATA: lv_pedido TYPE REF TO i,                    "REFERENCIA DE VARIABLE A UN TIPO DE VARIABLE, EJEMPLO i
+          lv_solped TYPE REF TO string.               "REFERENCIA DE VARIABLE A UN TIPO DE VARIABLE, EJEMPLO i
+
+    DATA lvr_contratos TYPE REF TO /dmo/airport.      "REFERENCIA DE VARIABLE RELACIONABLE LVR A UN TABLA INTERNA.
+
+    DATA lvr_servicios LIKE lv_pedido.                "REFERENCIA DE VARIABLE RELACIONABLE A VARIABLE GLOBAL OPCION OBSOLETA USADA EN CLASIC .
+    "PERO FUNCIONA
+
+    "   ************************************
+    TYPES: ltyr_pedido TYPE REF TO i.                 "DEFINICION DE ESTRUCTURA CON REFERENCIA A i EJEMPLO RECETA PASTEL
+    DATA lvr_PEDIDO2 TYPE ltyr_pedido.                "VARIABLE QUE HACE REFERENCIA A LA ESTRUCTURA, EJEMPLO PASTEL HECHO CON LA RECETA
+
+
+    DATA lt_ekko TYPE TABLE OF REF TO /dmo/airport.   "REFERENCIA DE UNA VARIABLE A UNA TABLA INTERNA
+
+    DATA lo_ref TYPE REF TO zeje_bloqi_type_complex.  "REFERENCIA DE VARIABLE A UNA CLASE EXISTENTE
+
+
+  ENDMETHOD.
+
+ENDCLASS.
