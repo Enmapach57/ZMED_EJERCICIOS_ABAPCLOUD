@@ -100,73 +100,108 @@ CLASS zeje_bloqii_oper_cad_caracii IMPLEMENTATION.
 
     """""""""" FUNCION REPLACE """"""""""""""""""
 
-    " Tu variable de la imagen
-    DATA(lv_codigo_material) = `HERR-TORN-0052`.
-
-
-    " Usamos REPLACE con expresiones regulares
-    " El patrón '\d{4}\$' significa: Busca los 4 dígitos numéricos (\d{4}) que estén al final (\$) del texto
-    DATA(lv_material_oculto) = replace( val   = lv_codigo_material
-                                       pcre = `\d{4}$`
-                                       with  = `****` ).
-
-    " Mandamos los resultados a la consola de ADT
-    out->write( |Material Original: { lv_codigo_material }| ). " Sigue originalito: HERR-TORN-0052
-    out->write( |Material Protegido: { lv_material_oculto }| ). " Imprime: HERR-TORN-****
+*    " Tu variable de la imagen
+*    DATA(lv_codigo_material) = `HERR-TORN-0052`.
+*
+*
+*    " Usamos REPLACE con expresiones regulares
+*    " El patrón '\d{4}\$' significa: Busca los 4 dígitos numéricos (\d{4}) que estén al final (\$) del texto
+*    DATA(lv_material_oculto) = replace( val   = lv_codigo_material
+*                                       pcre = `\d{4}$`
+*                                       with  = `****` ).
+*
+*    " Mandamos los resultados a la consola de ADT
+*    out->write( |Material Original: { lv_codigo_material }| ). " Sigue originalito: HERR-TORN-0052
+*    out->write( |Material Protegido: { lv_material_oculto }| ). " Imprime: HERR-TORN-****
 
     """""""" FUNCION PCRE REGEX """""""""""
 
-    " Opción 1: variable nueva, el original queda intacto
-    DATA(lv_limpio) = replace( val = lv_codigo_material pcre = `[^A-Za-z0-9]+` with = ` ` occ = 0 ).
-
-    out->write( |Material queda original: { lv_limpio }| ). " Imprime: HERR-TORN-****
-
-
-    " Opción 2: sin variable nueva, pisás la misma (igual que la instrucción de la profe)
-    lv_codigo_material = replace( val = lv_codigo_material pcre = `[^A-Za-z0-9]+` with = ` ` occ = 0 ).
-
-    out->write( |Material se sustituye: { lv_codigo_material }| ). " Imprime: HERR-TORN-****
+*    " Opción 1: variable nueva, el material queda sin guion, a diferencia del replace que saca de un texto un caracter
+*    " el replace con pcre quita todo lo que venga en un patron regex, porque si no se sabe que basura puede venir
+*    DATA(lv_limpio) = replace( val = lv_codigo_material pcre = `[^A-Za-z0-9]+` with = ` ` occ = 0 ).
+*
+*    out->write( |Material queda original: { lv_limpio }| ). " Imprime: HERR-TORN-****
+*
+*
+*    " Opción 2: sin variable nueva,
+*    " replace con sub: reemplaza un texto exacto (ej. el guion)
+*    " replace con pcre: reemplaza todo lo que NO sea letra ni número,
+*    " útil cuando no sabés qué símbolos pueden venir
+*
+*    lv_codigo_material = replace( val = lv_codigo_material pcre = `[^A-Za-z0-9]+` with = ` ` occ = 0 ).
+*
+*    out->write( |Material se sustituye: { lv_codigo_material }| ). " Imprime: HERR-TORN-****
 
 
     """"""" Operadores de comparación """""""""""""""""
 
 
-    " 1. El usuario ingresa un código de almacén de MM
-    DATA(lv_almacen_mm) = 'A00X'. " Almacén incorrecto porque tiene una X
-
-    " 2. Evaluamos con NP (No Pattern)
-    " Le decimos: 'Si el almacén NO CONTIENE la letra X en ninguna parte...'
-    IF lv_almacen_mm NP '*E*'.
-      out->write( |Almacén { lv_almacen_mm } -> Formato Válido| ).
-    ELSE.
-      " Como el texto SÍ contiene la X, el NP da falso y cae aquí:
-      out->write( |Almacén { lv_almacen_mm } -> ERROR: Contiene la letra prohibida X| ).
-    ENDIF.
+*    " 1. El usuario ingresa un código de almacén de MM
+*    DATA(lv_almacen_mm) = 'A00X'. " Almacén incorrecto porque tiene una X
+*
+*    " 2. Evaluamos con NP (No Pattern)
+*    " Le decimos: 'Si el almacén NO CONTIENE la letra X en ninguna parte...'
+*    IF lv_almacen_mm NP '*E*'.
+*      out->write( |Almacén { lv_almacen_mm } -> Formato Válido| ).
+*    ELSE.
+*      " Como el texto SÍ contiene la X, el NP da falso y cae aquí:
+*      out->write( |Almacén { lv_almacen_mm } -> ERROR: Contiene la letra prohibida X| ).
+*    ENDIF.
 
 *OPCION CON TYPE BOOLEANO, SI O NO
 
-    " 1. Declaramos la variable booleana que controlará el estado
-    DATA lv_necesita_aprobacion TYPE abap_bool.               "al declar el type_bool estamos queriendo traer un si o no
-    " en un juego de variables para saber si se cumple o no una cosa
+*    " 1. Declaramos la variable booleana que controlará el estado
+*    DATA lv_necesita_aprobacion TYPE abap_bool.               "al declar el type_bool estamos queriendo traer un si o no
+*    " en un juego de variables para saber si se cumple o no una cosa
+*
+*    DATA(lv_monto_pedido) = 150000. " Monto del pedido de MM
+*
+*    " 2. Evaluamos la condición de negocio
+*    IF lv_monto_pedido > 100000.
+*      " Si el pedido es caro, marcamos la bandera como VERDADERO
+*      lv_necesita_aprobacion = abap_true.
+*    ELSE.
+*      lv_necesita_aprobacion = abap_false.
+*    ENDIF.
+*
+*
+*    " --- Más adelante lo vemos en el proyecto monitor de atenciones medicas MM ---
+*    " 3. Evaluamos la variable booleana directamente en el IF
+*    IF lv_necesita_aprobacion = abap_true.
+*      out->write( 'Logística MM: Pedido bloqueado. Requiere aprobación del Gerente.' ).
+*    ELSE.
+*      out->write( 'Logística MM: Pedido aprobado automáticamente. Liberando para despacho.' ).
+*    ENDIF.
 
-    DATA(lv_monto_pedido) = 150000. " Monto del pedido de MM
+    """"""""""" Repetición de strings """"""""""""""""""""
 
-    " 2. Evaluamos la condición de negocio
-    IF lv_monto_pedido > 100000.
-      " Si el pedido es caro, marcamos la bandera como VERDADERO
-      lv_necesita_aprobacion = abap_true.
-    ELSE.
-      lv_necesita_aprobacion = abap_false.
-    ENDIF.
+*    " 1. Línea separadora para ordenar la salida del monitor
+*    out->write( repeat( val = `-` occ = 10 ) ).
+*
+*    " 2. Completar con ceros a la izquierda (relleno)
+*    DATA(lv_matnr) = `100`.
+*    DATA(lv_relleno) = repeat( val = `0` occ = 6 DIV strlen( lv_matnr ) ) && lv_matnr. "SE REPITE 6 VECES 0, STRLEN OBTIENE EL VALOR DE LA VARIABLE O FIJO
+*                                                                                       " Y DEL VALOR SE HACE UNA OPERACION NUMERICA
+*    " 000000000000000100
+*    out->write( lv_relleno ).
+*
+*    " 3. Enmascarar: parte visible + asteriscos (mezcla con concatenación)
+*    DATA(lv_oculto) = substring( val = `HERR-TORN-0052` len = 10 ) && repeat( val = `*` occ = 4 ).
+*    " HERR-TORN-****
+*    out->write( lv_oculto ).
 
 
-    " --- Más adelante lo vemos en el proyecto monitor de atenciones medicas MM ---
-    " 3. Evaluamos la variable booleana directamente en el IF
-    IF lv_necesita_aprobacion = abap_true.
-      out->write( 'Logística MM: Pedido bloqueado. Requiere aprobación del Gerente.' ).
-    ELSE.
-      out->write( 'Logística MM: Pedido aprobado automáticamente. Liberando para despacho.' ).
-    ENDIF.
+    """""""" FUNCION ESCAPE """""""""""""""""""}
+
+    " 1. Definimos nuestro texto con caracteres conflictivos (espacios y un ampersand)
+    DATA(lv_nombre_original) = 'Juan Pérez & Cía.'.
+
+    " 2. ESCAPAMOS el texto para que sea seguro usarlo en una URL
+    DATA(lv_nombre_seguro) = escape( val    = lv_nombre_original
+                                     format = cl_abap_format=>e_url_full ).
+
+    " 3. Lo mostramos en la consola de Eclipse
+    out->write( lv_nombre_seguro ).
 
 
   ENDMETHOD.
