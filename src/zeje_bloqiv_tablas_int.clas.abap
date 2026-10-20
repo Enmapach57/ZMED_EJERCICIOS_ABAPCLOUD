@@ -71,30 +71,60 @@ CLASS zeje_bloqiv_tablas_int IMPLEMENTATION.
 
 *_________ TABLA TIPO STANDART __________________*
 
-    DATA lt_pacientes TYPE STANDARD TABLE OF ty_pacientes WITH EMPTY KEY.
-
-    lt_pacientes = VALUE #(
-                          ( n_afiliado = 'AF-001' dni = '98454785' nombre = ' FLORINDA MACAYO' cliente = 'SOCIAL OSDE' )
-                          ( n_afiliado = 'AF-002' dni = '98454185' nombre = ' RAMON CAMACARO' cliente = 'SWISS MEDICA' )
-                                        ).
-    out->write( lt_pacientes ).
-
-    out->write( | | ).
-
-    DATA lt_profesional TYPE STANDARD TABLE OF ty_profesional WITH EMPTY KEY.
-
-    lt_profesional = VALUE #(
-                          ( cuit = '20-7845874' nombre = ' PACHECO ENMANUEL ' especialidad = 'GINECOLOGIA' modalidad_cobro = 'TRANSFERENCIA B' )
-                          ( cuit = '20-589652' nombre = ' ABRAHAN QUERALES' especialidad = ' CARDIOLOGIA ' modalidad_cobro = 'CHEQUE' )
-                                        ).
-    out->write( lt_profesional ).
+*    DATA lt_pacientes TYPE STANDARD TABLE OF ty_pacientes WITH EMPTY KEY.
+*
+*    lt_pacientes = VALUE #(
+*                          ( n_afiliado = 'AF-001' dni = '98454785' nombre = ' FLORINDA MACAYO' cliente = 'SOCIAL OSDE' )
+*                          ( n_afiliado = 'AF-002' dni = '98454185' nombre = ' RAMON CAMACARO' cliente = 'SWISS MEDICA' )
+*                                        ).
+*    out->write( lt_pacientes ).
+*
+*    out->write( | | ).
+*
+*    DATA lt_profesional TYPE STANDARD TABLE OF ty_profesional WITH EMPTY KEY.
+*
+*    lt_profesional = VALUE #(
+*                          ( cuit = '20-7845874' nombre = ' PACHECO ENMANUEL ' especialidad = 'GINECOLOGIA' modalidad_cobro = 'TRANSFERENCIA B' )
+*                          ( cuit = '20-589652' nombre = ' ABRAHAN QUERALES' especialidad = ' CARDIOLOGIA ' modalidad_cobro = 'CHEQUE' )
+*                                        ).
+*    out->write( lt_profesional ).
 
 
 
 *_________ TABLA TIPO SORTED  _____________*
+*
+*    DATA lt_pacientes TYPE SORTED TABLE OF ty_pacientes
+*                      WITH UNIQUE KEY  n_afiliado dni.
+*
+*    lt_pacientes = VALUE #(
+*                            ( n_afiliado = 'AF-001' dni = '98454785' nombre = ' FLORINDA MACAYO' cliente = 'SOCIAL OSDE' )
+*                             ( n_afiliado = 'AF-002' dni = '98454185' nombre = ' RAMON CAMACARO' cliente = 'SWISS MEDICA' ) ).
+*
+*    READ TABLE lt_pacientes INTO DATA(ty_pacientes)
+*    WITH KEY     n_afiliado = 'AF-001'
+*                 dni = '98454785'.
+*
+*    out->write( ty_pacientes ).
+
+*___________TABLA HASHED___________________*
 
 
+    " Declaración de la tabla Hashed (siempre debe ser UNIQUE)
+    DATA lt_profesional TYPE HASHED TABLE OF TY_profesional
+      WITH UNIQUE KEY cuit .
 
+
+    lt_profesional = VALUE #(
+                         ( cuit = '20-7845874' nombre = 'PACHECO ENMANUEL' especialidad = 'GINECOLOGIA' modalidad_cobro = 'TRANSFERENCIA B' )
+                          ( cuit = '20-589652' nombre = 'ABRAHAN QUERALES' especialidad = 'CARDIOLOGIA' modalidad_cobro = 'CHEQUE' ) ).
+
+    " Búsqueda obligatoria con la combinación COMPLETA
+    READ TABLE lt_profesional INTO DATA(ls_profesional)
+      WITH KEY cuit = '20-7845874'
+               nombre   = 'ENMANUEL PACHECO'. " <- Si falta uno, da error de sintaxis en ADT
+
+
+    out->write( ls_profesional ).
 
 
 
